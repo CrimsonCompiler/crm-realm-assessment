@@ -45,4 +45,9 @@ ORDER BY lead_count DESC;
 
 SELECT * FROM lead_priority_counts;
 
--- Example of a query 
+-- Example of a query  to test 
+
+INSERT INTO leads (Name, Email, Score)
+VALUES ('Ayesha Rahman', 'ayesha12@gmail.com', 70);
+
+SELECT * FROM lead_priority_counts;
