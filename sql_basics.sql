@@ -27,3 +27,22 @@ VALUES ('Tanvir Ahmed', 'tanvir@example.com', 95);
 
 -- Retrieving from the table 
 SELECT * FROM hot_leads;
+
+
+-- Write a query or a suitable SQL expression that reports the number of leads in each priority group: HOT, WARM, and COLD.
+
+CREATE VIEW lead_priority_counts AS
+SELECT
+    CASE
+        WHEN Score >= 80 AND Score <= 100 THEN 'HOT'
+        WHEN Score >= 50 AND Score <= 79 THEN 'WARM'
+        ELSE 'COLD'
+    END AS priority_group,
+    COUNT(*) AS lead_count
+FROM leads
+GROUP BY priority_group
+ORDER BY lead_count DESC;
+
+SELECT * FROM lead_priority_counts;
+
+-- Example of a query 
