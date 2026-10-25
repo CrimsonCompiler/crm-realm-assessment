@@ -26,18 +26,14 @@ class LeadModel {
     }
 }
 
-public class LeadTracker extends LeadModel {
-
-    public LeadTracker(String name, String email, int score) {
-        super(name, email, score);
-    }
+public class LeadTracker {
 
     private List<LeadModel> leads = new ArrayList<>();
 
     public String calculatePriority(int score) {
         if (score >= 80 && score <= 100) {
             return "HOT";
-        } else if (score >= 50 && score < 79) {
+        } else if (score >= 50 && score <= 79) {
             return "WARM";
         } else {
             return "COLD";
@@ -82,7 +78,7 @@ public class LeadTracker extends LeadModel {
     }
 
     public static void main(String[] args) {
-        LeadTracker tracker = new LeadTracker("John Doe", "john.doe@example.com", 85);
+        LeadTracker tracker = new LeadTracker();
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
 
