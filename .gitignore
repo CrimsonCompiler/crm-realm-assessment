@@ -1,0 +1,63 @@
+# ==========================================
+# Language: Java (Eclipse Specific)
+# ==========================================
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~
+.ninja_deps
+.ninja_log
+
+# Eclipse project files (Keep these if team members use the exact same paths, but generally ignored)
+.project
+.classpath
+.settings/
+.factorypath
+
+# ==========================================
+# Language: JavaScript (Node.js)
+# ==========================================
+node_modules/
+/js/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build directories (Frontend/Next.js/React if applicable)
+dist/
+build/
+.next/
+out/
+
+# ==========================================
+# Database: SQLite & SQL
+# ==========================================
+# Ignore SQLite database files generated during testing
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+
+# ==========================================
+# Operating System Files
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
