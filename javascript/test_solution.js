@@ -47,6 +47,14 @@ check('countLeadsByStatus counts each status', () => {
   assert.strictEqual(leads.length, 3);
 });
 
+// 5. A status that collides with an Object.prototype method stays retrievable
+//    and the result can still be coerced to a string.
+check('countLeadsByStatus handles a "toString" status', () => {
+  const counts = countLeadsByStatus([{ status: 'toString' }]);
+  assert.strictEqual(counts.counts.toString, 1);
+  assert.strictEqual(String(counts), '[object Object]');
+});
+
 console.log('\n=== PASS: ' + pass + '  FAIL: ' + fail + ' ===');
 if (fail > 0) {
   process.exit(1);
