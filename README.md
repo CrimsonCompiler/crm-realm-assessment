@@ -8,6 +8,10 @@ Lead tracker implemented in three parts, kept in one repository:
 | `javascript/` | `solution.js` — the three JavaScript problems, and `test_solution.js` |
 | `sql/` | `leads_table.sql` — SQLite schema, views and sample data |
 
+## License
+
+[MIT](LICENSE) © 2026 Tousif Tasrik
+
 ---
 
 ## 1. How to run
