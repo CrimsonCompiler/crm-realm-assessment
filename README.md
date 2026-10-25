@@ -163,7 +163,8 @@ their exact names. Normal statuses are still exposed directly on the result.
 ### Boundary values and invalid input
 
 These were verified during development and are the cases that drove the
-implementation decisions:
+implementation decisions. Two of them were defects found by review rather
+than by me, and section 6 describes how.
 
 - **Boundary scores** - `0` and `100` are accepted; `-1` and `101` are
   rejected. `80` is `HOT` and `79` is `WARM`, so the priority bands are
@@ -235,3 +236,76 @@ With more time I would:
 3. **Add a `package.json` test script** so `npm test` works, and widen the
    JavaScript suite back out to cover the boundary and invalid-input cases
    listed in section 3 individually.
+
+
+## 6. AI tools and other resources
+
+This is an open book assessment, and I used an AI coding assistant
+(`puku-cli`, running on the MiniMax model) throughout, together with the
+official documentation for the tools involved. I want to be precise about
+what was mine and what was assisted, because the git history makes the
+distinction visible.
+
+### What I wrote myself
+
+The original implementations on each branch, before any review:
+
+- `sql/leads_table.sql` - the `leads` table, the `hot_leads` and
+  `lead_priority_counts` views, and the sample data.
+- `javascript/solution.js` - `firstNonRepeatingChar`, `findTwoSum` and
+  `countLeadsByStatus`.
+- `java/LeadTracker.java` - the `LeadModel` class, the `LeadTracker`
+  console application and its menu loop.
+
+These are the commits `a1d3168` through `00455e8`, `0415db2`, and
+`38bb572` through `bc58104`. The problems were worked through by me: I
+chose the data structures, wrote the code, and decided the behaviour.
+
+### What the AI assistant was used for
+
+Mostly review and tooling, and in two cases it found real bugs that I
+had missed:
+
+1. **Reviewing my code against the brief** and pointing out defects.
+   This is where the two genuine bugs in section 3 came from:
+   - The SQLite `CHECK` constraint passing on a `NULL` score, so a
+     `NULL` bypassed the 0-100 range check and was silently counted as
+     `COLD` (fixed in `cb24b87`).
+   - `countLeadsByStatus` throwing `Cannot convert object to primitive
+     value` when a lead had the status `toString` (fixed in `2b13dc8`).
+2. **Writing the test suites** in `java/TestLeadTracker.java` and
+   `javascript/test_solution.js`, and running them to check the
+   implementations.
+3. **Git operations** - resolving the unrelated histories between the
+   branches, the merge commits, and the README and MIT license.
+4. **Documentation** - writing the README from a factual outline I
+   supplied, and the MIT license text, which I checked against the
+   canonical SPDX version.
+
+### A correction worth recording
+
+I originally reported the `toString` bug as fixed by copying counts with
+`Object.defineProperty`. That was wrong, and writing this README is what
+made me re-test the claim rather than trust it - `defineProperty` still
+made `toString` an own property holding the number `1`, so the object
+still threw when coerced to a string. The fix now keeps colliding
+statuses off the result object and exposes the counts on `result.counts`.
+I mention it because the interesting part of that bug was the iteration,
+not the fix.
+
+### Other resources consulted
+
+- SQLite documentation for the behaviour of `CHECK` constraints against
+  `NULL` values, which is what led to the `NOT NULL` fix.
+- The `Object.prototype` and `Object.defineProperty` behaviour in the
+  MDN JavaScript reference.
+- The SPDX licence list, to confirm the MIT text was the standard
+  unmodified version.
+
+### What was not used
+
+No code was copied from a tutorial, a course, or an existing repository.
+Every file in this repository was written for this assessment. The
+assistant's role was to review, test and document what I had written, and
+to catch the specific bugs listed above.
+
