@@ -44,14 +44,13 @@ function findTwoSum(nums, target) {
  * Works for any status value. A Map is used while counting so odd status
  * strings such as "__proto__" cannot cause trouble.
  *
- * The result is a plain object and every status is copied with defineProperty.
- * Using a bare assignment would let a status named "toString" or "valueOf"
- * shadow the inherited Object.prototype methods, which makes the returned
- * object throw when it is coerced to a string (e.g. String(result)).
- *
- * A null prototype is not used here because it removes toString/valueOf
- * entirely, so String(result) would throw for every input. The inherited
- * methods are preserved as long as no status shadows them.
+ * A status such as "toString" or "valueOf" collides with the inherited
+ * Object.prototype methods. Writing such a count as a normal property would
+ * replace the method with a number and make the result throw
+ * "Cannot convert object to primitive value" whenever it is coerced to a
+ * string. Those counts are therefore not written directly onto the result;
+ * the full set of counts is always available on result.counts under their
+ * exact names. Normal statuses are still exposed directly on the result.
  */
 function countLeadsByStatus(leads) {
   const counts = new Map();
@@ -64,14 +63,17 @@ function countLeadsByStatus(leads) {
     counts.set(key, (counts.get(key) || 0) + 1);
   }
 
-  const result = {};
+  const result = { counts: Object.create(null) };
   for (const [key, value] of counts) {
-    Object.defineProperty(result, key, {
-      value,
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
+    // Only safe names are written directly onto the result. The full set of
+    // counts is always available on result.counts under their exact names.
+    const isSafe = !['toString', 'valueOf', 'hasOwnProperty', 'constructor',
+      '__proto__', '__defineGetter__', '__defineSetter__', 'isPrototypeOf',
+      'propertyIsEnumerable', 'toLocaleString'].includes(key);
+    if (isSafe) {
+      result[key] = value;
+    }
+    result.counts[key] = value;
   }
   return result;
 }
