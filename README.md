@@ -1,18 +1,18 @@
-# CRM Realm — Junior Software Engineer Intern Assessment
+# CRM Realm - Junior Software Engineer Intern Assessment
 
 Lead tracker implemented in three parts, kept in one repository:
 
 | Directory | Contents |
 |---|---|
-| `java/` | `LeadTracker.java` — console application, and `TestLeadTracker.java` |
-| `javascript/` | `solution.js` — the three JavaScript problems, and `test_solution.js` |
-| `sql/` | `leads_table.sql` — SQLite schema, views and sample data |
+| `java/` | `LeadTracker.java` - console application, and `TestLeadTracker.java` |
+| `javascript/` | `solution.js` - the three JavaScript problems, and `test_solution.js` |
+| `sql/` | `leads_table.sql` - SQLite schema, views and sample data |
 
 ## License
 
 [MIT](LICENSE) © 2026 Tousif Tasrik
 
----
+
 
 ## 1. How to run
 
@@ -28,7 +28,7 @@ javac -d build java/LeadTracker.java
 java -cp build LeadTracker
 ```
 
-The app presents a menu — `1. Add Lead`, `2. View Leads`, `3. Exit` — and reads
+The app presents a menu - `1. Add Lead`, `2. View Leads`, `3. Exit` - and reads
 from standard input, so it can be driven either interactively or piped:
 
 ```bash
@@ -84,7 +84,7 @@ const { firstNonRepeatingChar, findTwoSum, countLeadsByStatus } = require('./jav
 
 ### SQL
 
-The script targets SQLite and is self-contained — it creates the table, both
+The script targets SQLite and is self-contained - it creates the table, both
 views, and inserts sample data.
 
 ```bash
@@ -96,7 +96,7 @@ sqlite3 leads.db "SELECT * FROM lead_priority_counts;"
 
 ## 2. Approach to each JavaScript problem
 
-### Problem 1 — First non-repeating character
+### Problem 1 - First non-repeating character
 
 Two passes over the string. The first pass counts occurrences of each
 character in a `Map`, keyed by the lowercase form of the character. The
@@ -111,7 +111,7 @@ two broken surrogate halves.
 
 **Time O(n), space O(k)** where k is the number of distinct characters.
 
-### Problem 2 — Two sum
+### Problem 2 - Two sum
 
 Single pass with a `Map` that stores `value -> index` for values already
 seen. For each number the complement (`target - num`) is computed; if the
@@ -124,7 +124,7 @@ the usual expected result for this problem.
 
 **Time O(n), space O(n).**
 
-### Problem 3 — Count leads by status
+### Problem 3 - Count leads by status
 
 A `Map` accumulates a count per status, then the map is copied into the
 returned object. The input array is never modified.
@@ -137,11 +137,11 @@ to a string. Those counts are therefore not written directly onto the result;
 instead the full set of counts is always available on `result.counts` under
 their exact names. Normal statuses are still exposed directly on the result.
 
----
+
 
 ## 3. Test cases
 
-### Java — `java/TestLeadTracker.java`
+### Java - `java/TestLeadTracker.java`
 
 | # | Case | Input | Expected |
 |---|---|---|---|
@@ -150,7 +150,7 @@ their exact names. Normal statuses are still exposed directly on the result.
 | 3 | Empty name and email rejected | `"  "`, `"   "` | returns `false` |
 | 4 | Score out of range rejected | `-1`, `101` | returns `false` |
 
-### JavaScript — `javascript/test_solution.js`
+### JavaScript - `javascript/test_solution.js`
 
 | # | Case | Input | Expected |
 |---|---|---|---|
@@ -163,32 +163,32 @@ their exact names. Normal statuses are still exposed directly on the result.
 ### Boundary values and invalid input
 
 These were verified during development and are the cases that drove the
-implementation decisions:
+implementation decisions. Two of them were defects found by review rather
+than by me, and section 6 describes how.
 
-- **Boundary scores** — `0` and `100` are accepted; `-1` and `101` are
+- **Boundary scores** - `0` and `100` are accepted; `-1` and `101` are
   rejected. `80` is `HOT` and `79` is `WARM`, so the priority bands are
   inclusive at the top and exclusive at the bottom.
-- **Empty and whitespace-only name/email** — rejected. A name of `"  "` is
+- **Empty and whitespace-only name/email** - rejected. A name of `"  "` is
   trimmed and found to be empty.
-- **Non-integer score** — the console app checks `scanner.hasNextInt()`
+- **Non-integer score** - the console app checks `scanner.hasNextInt()`
   before parsing, so entering `abc` prints an error instead of throwing.
-- **Non-string input to `firstNonRepeatingChar`** — returns `null` rather
+- **Non-string input to `firstNonRepeatingChar`** - returns `null` rather
   than throwing.
-- **Empty string** — returns `null` (no character occurs exactly once).
-- **A lead with no status** — counted under an explicit `UNKNOWN` key rather
+- **Empty string** - returns `null` (no character occurs exactly once).
+- **A lead with no status** - counted under an explicit `UNKNOWN` key rather
   than the literal string `"undefined"`.
-- **A status named `toString` or `valueOf`** — the count is stored under
+- **A status named `toString` or `valueOf`** - the count is stored under
   `counts.toString` and the result can still be coerced to a string. This was
   a real defect found by testing.
-- **Duplicate email** — the SQL schema enforces `UNIQUE` on `Email`, so a
+- **Duplicate email** - the SQL schema enforces `UNIQUE` on `Email`, so a
   duplicate insert is rejected by the database. The Java app keeps its leads
   in memory and does not currently enforce this itself; see section 5.
-- **`NULL` score in SQL** — SQLite evaluates a `CHECK` constraint to `NULL`
+- **`NULL` score in SQL** - SQLite evaluates a `CHECK` constraint to `NULL`
   for a `NULL` value and treats it as satisfied, so `Score` is declared
   `NOT NULL` to stop a `NULL` bypassing the 0–100 range check and being
   silently counted as `COLD`.
 
----
 
 ## 4. One decision or assumption
 
@@ -209,7 +209,6 @@ returns `null`), while the character returned preserves its original case.
 This treats `"a"` and `"A"` as the same character, which matches how the
 problem is usually framed.
 
----
 
 ## 5. One thing I would improve with more time
 
@@ -218,7 +217,7 @@ real test framework.**
 
 The two deliverables currently validate in slightly different ways. The Java
 app checks that a name and email are non-empty, but it does not check that
-the email is well-formed, so `"not-an-email"` is accepted — even though the
+the email is well-formed, so `"not-an-email"` is accepted - even though the
 SQL schema enforces a unique, non-null email. The two layers agree on the
 score range but not on email validity.
 
@@ -237,3 +236,76 @@ With more time I would:
 3. **Add a `package.json` test script** so `npm test` works, and widen the
    JavaScript suite back out to cover the boundary and invalid-input cases
    listed in section 3 individually.
+
+
+## 6. AI tools and other resources
+
+This is an open book assessment, and I used an AI coding assistant
+(`puku-cli`, running on the MiniMax model) throughout, together with the
+official documentation for the tools involved. I want to be precise about
+what was mine and what was assisted, because the git history makes the
+distinction visible.
+
+### What I wrote myself
+
+The original implementations on each branch, before any review:
+
+- `sql/leads_table.sql` - the `leads` table, the `hot_leads` and
+  `lead_priority_counts` views, and the sample data.
+- `javascript/solution.js` - `firstNonRepeatingChar`, `findTwoSum` and
+  `countLeadsByStatus`.
+- `java/LeadTracker.java` - the `LeadModel` class, the `LeadTracker`
+  console application and its menu loop.
+
+These are the commits `a1d3168` through `00455e8`, `0415db2`, and
+`38bb572` through `bc58104`. The problems were worked through by me: I
+chose the data structures, wrote the code, and decided the behaviour.
+
+### What the AI assistant was used for
+
+Mostly review and tooling, and in two cases it found real bugs that I
+had missed:
+
+1. **Reviewing my code against the brief** and pointing out defects.
+   This is where the two genuine bugs in section 3 came from:
+   - The SQLite `CHECK` constraint passing on a `NULL` score, so a
+     `NULL` bypassed the 0-100 range check and was silently counted as
+     `COLD` (fixed in `cb24b87`).
+   - `countLeadsByStatus` throwing `Cannot convert object to primitive
+     value` when a lead had the status `toString` (fixed in `2b13dc8`).
+2. **Writing the test suites** in `java/TestLeadTracker.java` and
+   `javascript/test_solution.js`, and running them to check the
+   implementations.
+3. **Git operations** - resolving the unrelated histories between the
+   branches, the merge commits, and the README and MIT license.
+4. **Documentation** - writing the README from a factual outline I
+   supplied, and the MIT license text, which I checked against the
+   canonical SPDX version.
+
+### A correction worth recording
+
+I originally reported the `toString` bug as fixed by copying counts with
+`Object.defineProperty`. That was wrong, and writing this README is what
+made me re-test the claim rather than trust it - `defineProperty` still
+made `toString` an own property holding the number `1`, so the object
+still threw when coerced to a string. The fix now keeps colliding
+statuses off the result object and exposes the counts on `result.counts`.
+I mention it because the interesting part of that bug was the iteration,
+not the fix.
+
+### Other resources consulted
+
+- SQLite documentation for the behaviour of `CHECK` constraints against
+  `NULL` values, which is what led to the `NOT NULL` fix.
+- The `Object.prototype` and `Object.defineProperty` behaviour in the
+  MDN JavaScript reference.
+- The SPDX licence list, to confirm the MIT text was the standard
+  unmodified version.
+
+### What was not used
+
+No code was copied from a tutorial, a course, or an existing repository.
+Every file in this repository was written for this assessment. The
+assistant's role was to review, test and document what I had written, and
+to catch the specific bugs listed above.
+
