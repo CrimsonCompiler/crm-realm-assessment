@@ -28,6 +28,9 @@ class LeadModel {
 
 public class LeadTracker {
 
+    private static final int MIN_SCORE = 0;
+    private static final int MAX_SCORE = 100;
+
     private List<LeadModel> leads = new ArrayList<>();
 
     public String calculatePriority(int score) {
@@ -40,6 +43,68 @@ public class LeadTracker {
         }
     }
 
+    /**
+     * Validates an email address. Requires a single "@" separating a non-empty
+     * local part from a non-empty domain that contains a "." and has no
+     * whitespace or leading/trailing dots around the domain labels.
+     */
+    private static boolean isValidEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return false;
+        }
+        if (email.contains(" ")) {
+            return false;
+        }
+
+        int at = email.indexOf('@');
+        if (at != email.lastIndexOf('@') || at <= 0 || at == email.length() - 1) {
+            return false;
+        }
+
+        String local = email.substring(0, at);
+        String domain = email.substring(at + 1);
+
+        if (local.startsWith(".") || local.endsWith(".") || local.contains("..")) {
+            return false;
+        }
+        if (domain.startsWith(".") || domain.startsWith("-") || domain.endsWith(".")
+                || domain.endsWith("-") || domain.contains("..")) {
+            return false;
+        }
+
+        int dot = domain.indexOf('.');
+        if (dot <= 0 || dot == domain.length() - 1) {
+            return false;
+        }
+
+        // TLD must be alphabetic and at least two characters.
+        String tld = domain.substring(domain.lastIndexOf('.') + 1);
+        if (tld.length() < 2) {
+            return false;
+        }
+        for (int i = 0; i < tld.length(); i++) {
+            if (!Character.isLetter(tld.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Emails are unique per lead (mirrors the UNIQUE constraint in the SQL
+     * schema). Comparison is case-insensitive because email local parts are
+     * case-insensitive in practice.
+     */
+    private boolean emailExists(String email) {
+        for (LeadModel lead : leads) {
+            if (lead.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean addLead(String name, String email, int score) {
         if (name == null || name.trim().isEmpty()) {
             System.out.println("Error: Name cannot be empty.");
@@ -47,8 +112,14 @@ public class LeadTracker {
         } else if (email == null || email.trim().isEmpty()) {
             System.out.println("Error: Email cannot be empty.");
             return false;
-        } else if (score < 0 || score > 100) {
-            System.out.println("Error: Score must be between 0 and 100.");
+        } else if (!isValidEmail(email.trim())) {
+            System.out.println("Error: '" + email.trim() + "' is not a valid email address.");
+            return false;
+        } else if (emailExists(email.trim())) {
+            System.out.println("Error: A lead with email '" + email.trim() + "' already exists.");
+            return false;
+        } else if (score < MIN_SCORE || score > MAX_SCORE) {
+            System.out.println("Error: Score must be between " + MIN_SCORE + " and " + MAX_SCORE + ".");
             return false;
         }
 
